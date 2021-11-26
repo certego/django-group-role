@@ -42,6 +42,7 @@ from django_group_role import Role
 
 class BasicRole(Role):
     name = "Base"
+    abstract = True
     permissions = ["auth.view_user", "auth.view_group"]
 
 
@@ -60,6 +61,8 @@ class DerivedRole(BasicRole):
     }
 
 ```
+
+> NOTE: to do not have the command creating a "base" group set it as ``abstract = True``
 
 
 ## Role inheritance
