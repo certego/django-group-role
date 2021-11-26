@@ -1,25 +1,14 @@
 from functools import reduce, partialmethod
 import inspect
 from importlib import import_module
-from django.conf import settings
-from django.contrib.auth.models import Group
-from django.core.exceptions import (
-    ImproperlyConfigured,
-    ObjectDoesNotExist,
-    MultipleObjectsReturned,
-)
-from guardian.shortcuts import assign_perm
+from django.core.exceptions import ImproperlyConfigured, MultipleObjectsReturned
+from .exceptions import BadRoleException
+from .utils import map_permissions
 
 try:  # prefer python builtin cached_property
     from functools import cached_property
 except ImportError:
     from django.utils.functional import cached_property
-
-
-class BadRoleException(Exception):
-    def __init__(self, message, permission):
-        self.permission = permission
-        super().__init__(message)
 
 
 class _RoleRegistry(dict):
@@ -39,20 +28,16 @@ registry = _RoleRegistry()
 class RegisterRoleMeta(type):
     @classmethod
     def _get_declared_permissions(cls, bases, classdict):
-        permissions = classdict.pop("permissions", [])
-        assert not bases or isinstance(
-            permissions, (list, tuple, set)
-        ), "Role permissions must be a list a set or a tuple"
-        assert all(
-            isinstance(p, str) for p in permissions
-        ), "Permissions must be represented with strings"
+        permissions = classdict.get("permissions", [])
         # merge permissions with base classes
+        permissions = [permissions]
         if bases:
-            permissions += reduce(
-                lambda a, b: a + getattr(b, "_permissions"), bases, []
+            permissions = reduce(
+                lambda a, b: a + [getattr(b, "permissions", None)], bases, permissions
             )
+        permissions = map_permissions(*permissions)
         assert not bases or permissions, "A Role must specify at least 1 permission"
-        return list(set(permissions))
+        return permissions
 
     @classmethod
     def _get_declared_group_name(cls, bases, classdict):
@@ -77,10 +62,12 @@ class Role(metaclass=RegisterRoleMeta):
     """Base role class. Every role must inherit from this."""
 
     name: str = None
-    permissions = set()
+    permissions = []
 
     @cached_property
     def group(self):
+        from django.contrib.auth.models import Group
+
         group, _created = Group.objects.get_or_create(name=self._group)
         return group
 
@@ -90,16 +77,42 @@ class Role(metaclass=RegisterRoleMeta):
         Args:
             clear (bool, optional): If passed as True also clears existing permissions bound to this role. Defaults to False.
         """
+        from django.contrib.auth.models import Permission
+        from guardian.shortcuts import assign_perm
+
         if clear:
             self.group.permissions.clear()
 
-        for perm in self._permissions:
-            try:
-                assign_perm(perm, self.group)
-            except (ValueError, ObjectDoesNotExist, MultipleObjectsReturned):
-                raise BadRoleException(
-                    f"Permission {perm} cannot be bound to role", perm
-                )
+        for app_label, app_perms in self._permissions.items():
+            for modelname, perms in app_perms.items():
+                if modelname == "_codenames":
+                    # handle codenames permissions
+                    for perm in perms:
+                        perm = f"{app_label}.{perm}"
+                        try:
+                            assign_perm(perm, self.group)
+                        except (
+                            ValueError,
+                            Permission.DoesNotExist,
+                            MultipleObjectsReturned,
+                        ):
+                            raise BadRoleException(
+                                f"Permission {perm} cannot be bound to role", perm
+                            )
+                else:
+                    # model-grouped perms
+                    for perm in perms:
+                        try:
+                            perm = Permission.objects.get_by_natural_key(
+                                perm, app_label, modelname
+                            )
+                        except (ValueError, Permission.DoesNotExist):
+                            raise BadRoleException(
+                                f"Permission {perm} ({app_label})  cannot be bound to role",
+                                f"{app_label}.{perm}",
+                            )
+                        else:
+                            assign_perm(perm, self.group)
 
     # wrappers for group methods
     def _wrap_group_method(self, method, *args, **kwargs):
@@ -113,6 +126,8 @@ class Role(metaclass=RegisterRoleMeta):
 
 
 def load_roles():
+    from django.conf import settings
+
     role_module = getattr(settings, "ROLES_MODULE", None)
     if not role_module:
         raise ImproperlyConfigured(

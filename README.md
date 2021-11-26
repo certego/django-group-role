@@ -28,10 +28,12 @@ ROLES_MODULE = "myproject.roles"
 "Roles" are classes derived from `django_group_role.roles.Role` and should declare the following two attributes:
 
 - `name`: the name of the group which will be bound to this role (mandatory)
-- `permissions`: a list of available permission which will be bound to this role, they must be provided using the notation `'<app-name>.<codename>'`
+- `permissions`: specify which permissions are granted to this role, it may be indicated in one of the following form:
+   - a _list_ of available permission which will be bound to this role, they must be provided using the notation `'<appname>.<codename>'`
+   - a _dict_ which keys can be app-names or `<appname.model>` (see example below)
 
 ```python
-from django_group_role.roles import Role
+from django_group_role import Role
 
 
 class BasicRole(Role):
@@ -46,9 +48,15 @@ class ExpandedRole(BasicRole):
 
 class DerivedRole(BasicRole):
     name = "Derived"
-    permissions = ["auth.add_group", "auth.view_group", "auth.delete_group"]
+    permissions = {
+        'auth': {
+            'user': ['view_user', 'add_user', 'delete_user']
+        },
+        'auth.group': ['view_group'],
+    }
 
 ```
+
 
 ## Role inheritance
 Roles can derive one-another like normal python classes, when a roles extend an other one it is not required to provide the `permissions` list. When extending an existing role its permissions gets merged with those defined in the base class.
