@@ -30,6 +30,7 @@ class OnlySelectedTestCase(BaseTestingTestCase):
                 "User-Managers",
                 "Users",
             ],
+            transform=str,
         )
         group = Group.objects.get_by_natural_key("Users")
         self.assertQuerysetEqual(
@@ -66,6 +67,7 @@ class OverrideFromRolesTestCase(BaseTestingTestCase):
                 "Groupers",
                 "Managers",
             ],
+            transform=str,
         )
         group = Group.objects.get_by_natural_key("Base")
         self.assertQuerysetEqual(

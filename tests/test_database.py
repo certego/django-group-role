@@ -29,6 +29,7 @@ class DatabaseSetupTestCase(TestCase):
         self.assertQuerysetEqual(
             role.group.permissions.values_list("codename", flat=True),
             ["view_user", "view_group", "delete_user"],
+            transform=str,
             ordered=False,
         )
 
@@ -44,5 +45,6 @@ class DatabaseSetupTestCase(TestCase):
                 "view_user",
                 "view_group",
             ],
+            transform=str,
             ordered=False,
         )
