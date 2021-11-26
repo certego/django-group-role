@@ -1,4 +1,8 @@
 # Django Group Role
+[![Linters/Tests](https://github.com/certego/django-group-role/actions/workflows/ci.yaml/badge.svg)](https://github.com/certego/django-group-role/actions/workflows/ci.yaml)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/django-group-role)](https://img.shields.io/pypi/pyversions/django-group-role)
+[![Django version](https://img.shields.io/pypi/djversions/django-group-role)](https://img.shields.io/pypi/djversions/django-group-role)
+
 `django-group-role` aims to simplify "role based access" in django-based projects and applications.
 This app is build on top on `contrib.auth` and `guardian` apps.
 
@@ -38,6 +42,7 @@ from django_group_role import Role
 
 class BasicRole(Role):
     name = "Base"
+    abstract = True
     permissions = ["auth.view_user", "auth.view_group"]
 
 
@@ -56,6 +61,8 @@ class DerivedRole(BasicRole):
     }
 
 ```
+
+> NOTE: to do not have the command creating a "base" group set it as ``abstract = True``
 
 
 ## Role inheritance

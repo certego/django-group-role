@@ -1,5 +1,5 @@
 from django.test import SimpleTestCase
-from django_group_role import Role
+from django_group_role import Role, registry
 from example_project.roles import UserManagers, GroupManagers, BasicRole
 
 
@@ -63,3 +63,11 @@ class DefinitionsTestCase(SimpleTestCase):
                 }
             },
         )
+
+    def test_abstract_role(self):
+        class AbstractRole(Role):
+            abstract = True
+            name = "abstract"
+            permissions = ["auth.view_user"]
+
+        self.assertNotIn("abstract", registry)

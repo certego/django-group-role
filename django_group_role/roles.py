@@ -51,7 +51,7 @@ class RegisterRoleMeta(type):
         classdict["_group"] = cls._get_declared_group_name(bases, classdict)
         classdict["_permissions"] = cls._get_declared_permissions(bases, classdict)
         role_class = super().__new__(cls, classname, bases, classdict, **kwargs)
-        if bases:
+        if not classdict.get("abstract", False):
             # add role to register
             registry[role_class._group] = role_class
 
@@ -63,6 +63,7 @@ class Role(metaclass=RegisterRoleMeta):
 
     name: str = None
     permissions = []
+    abstract = True
 
     @cached_property
     def group(self):
