@@ -1,4 +1,4 @@
-from django_group_role.roles import Role
+from django_group_role import Role
 
 
 class Base(Role):

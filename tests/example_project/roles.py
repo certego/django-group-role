@@ -1,4 +1,4 @@
-from django_group_role.roles import Role
+from django_group_role import Role
 
 
 class BasicRole(Role):
@@ -14,6 +14,17 @@ class UserManagers(BasicRole):
 class GroupManagers(BasicRole):
     name = "Group-Managers"
     permissions = ["auth.add_group", "auth.view_group", "auth.delete_group"]
+
+
+class Erasers(Role):
+    name = "Erasers"
+    permissions = {
+        "auth": {
+            "user": ["delete_user"],
+            "group": ["delete_group"],
+            "permission": ["delete_permission", "broken"],
+        }
+    }
 
 
 class BrokenRole(Role):

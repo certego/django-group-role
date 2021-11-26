@@ -31,12 +31,14 @@ class CommandTestCase(TestCase):
                 'Role "User-Managers" setup completed!',
                 'Setting permissions for role "Group-Managers"...',
                 'Role "Group-Managers" setup completed!',
+                'Setting permissions for role "Erasers"...',
+                'Unable to bound permission to "Erasers" (Permission broken (auth)  cannot be bound to role)',
                 'Setting permissions for role "Broken"...',
                 'Unable to bound permission to "Broken" (Permission auth.non_existing_perm cannot be bound to role)',
                 "",
             ],
         )
-        self.assertEqual(Group.objects.all().count(), 5)
+        self.assertEqual(Group.objects.all().count(), 6)
         group = Group.objects.get_by_natural_key("Users")
         self.assertQuerysetEqual(
             group.permissions.all(),
@@ -88,12 +90,14 @@ class CommandTestCase(TestCase):
                 'Role "User-Managers" setup completed!',
                 'Setting permissions for role "Group-Managers"...',
                 'Role "Group-Managers" setup completed!',
+                'Setting permissions for role "Erasers"...',
+                'Unable to bound permission to "Erasers" (Permission broken (auth)  cannot be bound to role)',
                 'Setting permissions for role "Broken"...',
                 'Unable to bound permission to "Broken" (Permission auth.non_existing_perm cannot be bound to role)',
                 "",
             ],
         )
-        self.assertEqual(Group.objects.all().count(), 5)
+        self.assertEqual(Group.objects.all().count(), 6)
         group = Group.objects.get_by_natural_key("Users")
         self.assertQuerysetEqual(
             group.permissions.all(),

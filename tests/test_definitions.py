@@ -1,5 +1,5 @@
 from django.test import SimpleTestCase
-from django_group_role.roles import Role
+from django_group_role import Role
 from example_project.roles import UserManagers, GroupManagers, BasicRole
 
 
@@ -17,7 +17,7 @@ class DefinitionsTestCase(SimpleTestCase):
 
     def test_role_wrong_permissions(self):
         with self.assertRaisesMessage(
-            AssertionError, "Role permissions must be a list a set or a tuple"
+            AssertionError, "Role permissions must be a list, a set, a tuple or a dict"
         ):
 
             class NoPermRole(Role):
@@ -33,7 +33,8 @@ class DefinitionsTestCase(SimpleTestCase):
                 permissions = []
 
         with self.assertRaisesMessage(
-            AssertionError, "Permissions must be represented with strings"
+            ValueError,
+            "Permissions, should be defined in the format: 'app_label.codename' (is perm)",
         ):
 
             class NoPermRole(Role):
@@ -43,14 +44,22 @@ class DefinitionsTestCase(SimpleTestCase):
     def test_role_composition(self):
         self.assertCountEqual(
             UserManagers._permissions,
-            ["auth.view_user", "auth.view_group", "auth.add_user", "auth.change_user"],
+            {
+                "auth": {
+                    "_codenames": {"view_user", "view_group", "add_user", "change_user"}
+                }
+            },
         )
         self.assertCountEqual(
             GroupManagers._permissions,
-            [
-                "auth.view_user",
-                "auth.view_group",
-                "auth.add_group",
-                "auth.delete_group",
-            ],
+            {
+                "auth": {
+                    "_codenames": {
+                        "view_user",
+                        "view_group",
+                        "add_group",
+                        "delete_group",
+                    }
+                }
+            },
         )
