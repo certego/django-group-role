@@ -50,8 +50,10 @@ class RegisterRoleMeta(type):
     def __new__(cls, classname, bases, classdict, **kwargs):
         classdict["_group"] = cls._get_declared_group_name(bases, classdict)
         classdict["_permissions"] = cls._get_declared_permissions(bases, classdict)
+        # stop inheritance of abstractness
+        is_abstract = classdict.setdefault("abstract", False)
         role_class = super().__new__(cls, classname, bases, classdict, **kwargs)
-        if not classdict.get("abstract", False):
+        if not is_abstract:
             # add role to register
             registry[role_class._group] = role_class
 
@@ -147,6 +149,7 @@ def load_roles():
         if (
             issubclass(candidate, Role)
             and candidate._group not in registry
+            and not candidate.abstract  # do not register abstract roles
             and not candidate is Role  # avoid base class to be added to registry
         ):
             registry[candidate._group] = candidate
