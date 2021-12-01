@@ -16,6 +16,12 @@ class GroupManagers(BasicRole):
     permissions = ["auth.add_group", "auth.view_group", "auth.delete_group"]
 
 
+class AbstractRole(Role):
+    name = "Abstract"
+    abstract = True
+    permissions = ["auth.add_group", "auth.view_group", "auth.delete_group"]
+
+
 class Erasers(Role):
     name = "Erasers"
     permissions = {
