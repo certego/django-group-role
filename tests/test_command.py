@@ -29,8 +29,8 @@ class CommandTestCase(TestCase):
                 'Role "Users" setup completed!',
                 'Setting permissions for role "User-Managers"...',
                 'Role "User-Managers" setup completed!',
-                'Setting permissions for role "Group-Managers"...',
-                'Role "Group-Managers" setup completed!',
+                'Setting permissions for role "Group Managers"...',
+                'Role "Group Managers" setup completed!',
                 'Setting permissions for role "Erasers"...',
                 'Unable to bound permission to "Erasers" (Permission broken (auth)  cannot be bound to role)',
                 'Setting permissions for role "Broken"...',
@@ -63,7 +63,7 @@ class CommandTestCase(TestCase):
             transform=lambda p: p.natural_key(),
             ordered=False,
         )
-        group = Group.objects.get_by_natural_key("Group-Managers")
+        group = Group.objects.get_by_natural_key("Group Managers")
         self.assertQuerysetEqual(
             group.permissions.all(),
             [
@@ -88,8 +88,8 @@ class CommandTestCase(TestCase):
                 'Role "Users" setup completed!',
                 'Setting permissions for role "User-Managers"...',
                 'Role "User-Managers" setup completed!',
-                'Setting permissions for role "Group-Managers"...',
-                'Role "Group-Managers" setup completed!',
+                'Setting permissions for role "Group Managers"...',
+                'Role "Group Managers" setup completed!',
                 'Setting permissions for role "Erasers"...',
                 'Unable to bound permission to "Erasers" (Permission broken (auth)  cannot be bound to role)',
                 'Setting permissions for role "Broken"...',
@@ -120,7 +120,7 @@ class CommandTestCase(TestCase):
             transform=lambda p: p.natural_key(),
             ordered=False,
         )
-        group = Group.objects.get_by_natural_key("Group-Managers")
+        group = Group.objects.get_by_natural_key("Group Managers")
         self.assertQuerysetEqual(
             group.permissions.all(),
             [
@@ -170,4 +170,30 @@ class CommandTestCase(TestCase):
         )
         # group managers was not created at all
         with self.assertRaises(Group.DoesNotExist):
-            Group.objects.get_by_natural_key("Group-Managers")
+            Group.objects.get_by_natural_key("Group Managers")
+
+    def test_apply_single_role_fuzzy_dash(self):
+        self.assertEqual(Group.objects.all().count(), 3)
+        out = StringIO()
+        call_command("populate_roles", "group-managers", clear=True, fuzzy=True, stdout=out)
+        self.assertEqual(
+            out.getvalue().split("\n"),
+            [
+                "Clear mode enabled, already bound permissions will be removed!",
+                'Setting permissions for role "Group Managers"...',
+                'Role "Group Managers" setup completed!',
+                "",
+            ],
+        )
+        group = Group.objects.get_by_natural_key("Group Managers")
+        self.assertQuerysetEqual(
+            group.permissions.all(),
+            [
+                ("view_group", "auth", "group"),
+                ("view_user", "auth", "user"),
+                ("add_group", "auth", "group"),
+                ("delete_group", "auth", "group"),
+            ],
+            transform=lambda p: p.natural_key(),
+            ordered=False,
+        )

@@ -12,7 +12,7 @@ class UserManagers(BasicRole):
 
 
 class GroupManagers(BasicRole):
-    name = "Group-Managers"
+    name = "Group Managers"
     permissions = ["auth.add_group", "auth.view_group", "auth.delete_group"]
 
 
