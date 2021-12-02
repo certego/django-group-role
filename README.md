@@ -1,7 +1,8 @@
 # Django Group Role
-[![Linters/Tests](https://github.com/certego/django-group-role/actions/workflows/ci.yaml/badge.svg)](https://github.com/certego/django-group-role/actions/workflows/ci.yaml)
-[![PyPI pyversions](https://img.shields.io/pypi/pyversions/django-group-role)](https://img.shields.io/pypi/pyversions/django-group-role)
-[![Django version](https://img.shields.io/pypi/djversions/django-group-role)](https://img.shields.io/pypi/djversions/django-group-role)
+[![Linters/Tests][ci-badge]][ci]
+[![PyPI versions][pypi-badge]][pypi]
+[![PyPI pyversions][pythonver]][pypi]
+[![Django version][djversion]][pypi]
 
 `django-group-role` aims to simplify "role based access" in django-based projects and applications.
 This app is build on top on `contrib.auth` and `guardian` apps.
@@ -86,3 +87,11 @@ For django style `TestCase` based testing is it possible to use the `RoleEnabled
 ## Credits
 
 This work was in part inspired by [django-role-permissions](https://github.com/vintasoftware/django-role-permissions).
+
+
+[pypi]: https://pypi.org/project/django-group-role/
+[pypi-badge]: https://img.shields.io/pypi/v/django-group-role
+[pythonver]: https://img.shields.io/pypi/pyversions/django-group-role
+[djversion]: https://img.shields.io/pypi/djversions/django-group-role
+[ci]: https://github.com/certego/django-group-role/actions/workflows/ci.yaml
+[ci-badge]: https://github.com/certego/django-group-role/actions/workflows/ci.yaml/badge.svg
