@@ -31,6 +31,8 @@ class CommandTestCase(TestCase):
                 'Role "User-Managers" setup completed!',
                 'Setting permissions for role "Group Managers"...',
                 'Role "Group Managers" setup completed!',
+                'Setting permissions for role "Top-Managers"...',
+                'Role "Top-Managers" setup completed!',
                 'Setting permissions for role "Erasers"...',
                 'Unable to bound permission to "Erasers" (Permission broken (auth)  cannot be bound to role)',
                 'Setting permissions for role "Broken"...',
@@ -38,7 +40,7 @@ class CommandTestCase(TestCase):
                 "",
             ],
         )
-        self.assertEqual(Group.objects.all().count(), 6)
+        self.assertEqual(Group.objects.all().count(), 7)
         group = Group.objects.get_by_natural_key("Users")
         self.assertQuerysetEqual(
             group.permissions.all(),
@@ -71,6 +73,21 @@ class CommandTestCase(TestCase):
                 ("view_user", "auth", "user"),
                 ("add_group", "auth", "group"),
                 ("delete_group", "auth", "group"),
+            ],
+            transform=lambda p: p.natural_key(),
+            ordered=False,
+        )
+        group = Group.objects.get_by_natural_key("Top-Managers")
+        self.assertQuerysetEqual(
+            group.permissions.all(),
+            [
+                ("view_user", "auth", "user"),
+                ("view_group", "auth", "group"),
+                ("add_group", "auth", "group"),
+                ("delete_group", "auth", "group"),
+                ("view_permission", "auth", "permission"),
+                ("add_permission", "auth", "permission"),
+                ("delete_permission", "auth", "permission"),
             ],
             transform=lambda p: p.natural_key(),
             ordered=False,
@@ -90,6 +107,8 @@ class CommandTestCase(TestCase):
                 'Role "User-Managers" setup completed!',
                 'Setting permissions for role "Group Managers"...',
                 'Role "Group Managers" setup completed!',
+                'Setting permissions for role "Top-Managers"...',
+                'Role "Top-Managers" setup completed!',
                 'Setting permissions for role "Erasers"...',
                 'Unable to bound permission to "Erasers" (Permission broken (auth)  cannot be bound to role)',
                 'Setting permissions for role "Broken"...',
@@ -97,7 +116,7 @@ class CommandTestCase(TestCase):
                 "",
             ],
         )
-        self.assertEqual(Group.objects.all().count(), 6)
+        self.assertEqual(Group.objects.all().count(), 7)
         group = Group.objects.get_by_natural_key("Users")
         self.assertQuerysetEqual(
             group.permissions.all(),
@@ -128,6 +147,21 @@ class CommandTestCase(TestCase):
                 ("view_user", "auth", "user"),
                 ("add_group", "auth", "group"),
                 ("delete_group", "auth", "group"),
+            ],
+            transform=lambda p: p.natural_key(),
+            ordered=False,
+        )
+        group = Group.objects.get_by_natural_key("Top-Managers")
+        self.assertQuerysetEqual(
+            group.permissions.all(),
+            [
+                ("view_user", "auth", "user"),
+                ("view_group", "auth", "group"),
+                ("add_group", "auth", "group"),
+                ("delete_group", "auth", "group"),
+                ("view_permission", "auth", "permission"),
+                ("add_permission", "auth", "permission"),
+                ("delete_permission", "auth", "permission"),
             ],
             transform=lambda p: p.natural_key(),
             ordered=False,
