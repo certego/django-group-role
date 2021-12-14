@@ -93,3 +93,32 @@ class UtilsSimpleTestCase(SimpleTestCase):
                 },
             },
         )
+
+    def test_map_permissions_dict_plus_dict(self):
+        perm_map = map_permissions(
+            {
+                "auth": {"user": ["view_user"]},
+                "myapp": {"mymodel": ["delete_mymodel"]},
+                "otherapp.element": ["view_element"],
+            },
+            {
+                "auth.user": ["view_user", "change_user"],
+                "auth": {"group": ["view_group"]},
+                "myapp.mymodel": ["view_mymodel", "change_mymodel"],
+            },
+        )
+        self.assertEqual(
+            perm_map,
+            {
+                "auth": {
+                    "user": {"view_user", "change_user"},
+                    "group": {"view_group"},
+                },
+                "myapp": {
+                    "mymodel": {"view_mymodel", "change_mymodel", "delete_mymodel"},
+                },
+                "otherapp": {
+                    "element": {"view_element"},
+                },
+            },
+        )

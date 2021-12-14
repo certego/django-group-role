@@ -16,6 +16,15 @@ class GroupManagers(BasicRole):
     permissions = ["auth.add_group", "auth.view_group", "auth.delete_group"]
 
 
+class GroupPermManagers(GroupManagers):
+    name = "Top-Managers"
+    permissions = [
+        "auth.add_permission",
+        "auth.view_permission",
+        "auth.delete_permission",
+    ]
+
+
 class AbstractRole(Role):
     name = "Abstract"
     abstract = True

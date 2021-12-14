@@ -5,12 +5,19 @@ from ...roles import registry, load_roles, BadRoleException
 
 
 def _fuzzy_search(rolenames):
-    fuzzy_rolenames = [name.lower().replace('-', ' ').replace('_', ' ') for name in rolenames]
+    fuzzy_rolenames = [
+        name.lower().replace("-", " ").replace("_", " ") for name in rolenames
+    ]
 
     def search(name):
-        return not rolenames or name in rolenames or name.lower().replace('-', ' ').replace('_', ' ') in fuzzy_rolenames
+        return (
+            not rolenames
+            or name in rolenames
+            or name.lower().replace("-", " ").replace("_", " ") in fuzzy_rolenames
+        )
 
     return search
+
 
 def _standard_search(rolenames):
     def search(name):

@@ -33,7 +33,7 @@ class RegisterRoleMeta(type):
         permissions = [permissions]
         if bases:
             permissions = reduce(
-                lambda a, b: a + [getattr(b, "permissions", None)], bases, permissions
+                lambda a, b: a + [getattr(b, "_permissions", None)], bases, permissions
             )
         permissions = map_permissions(*permissions)
         assert not bases or permissions, "A Role must specify at least 1 permission"
@@ -119,7 +119,7 @@ class Role(metaclass=RegisterRoleMeta):
 
     # wrappers for group methods
     def _wrap_group_method(self, method, *args, **kwargs):
-        method = getattr(self.group, method)
+        method = getattr(self.group.user_set, method)
         return method(*args, **kwargs)
 
     add = partialmethod(_wrap_group_method, method="add")
