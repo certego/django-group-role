@@ -209,7 +209,9 @@ class CommandTestCase(TestCase):
     def test_apply_single_role_fuzzy_dash(self):
         self.assertEqual(Group.objects.all().count(), 3)
         out = StringIO()
-        call_command("populate_roles", "group-managers", clear=True, fuzzy=True, stdout=out)
+        call_command(
+            "populate_roles", "group-managers", clear=True, fuzzy=True, stdout=out
+        )
         self.assertEqual(
             out.getvalue().split("\n"),
             [
