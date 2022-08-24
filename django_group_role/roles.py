@@ -2,13 +2,9 @@ from functools import reduce, partialmethod
 import inspect
 from importlib import import_module
 from django.core.exceptions import ImproperlyConfigured, MultipleObjectsReturned
+from django.utils.functional import cached_property
 from .exceptions import BadRoleException
 from .utils import map_permissions
-
-try:  # prefer python builtin cached_property
-    from functools import cached_property
-except ImportError:
-    from django.utils.functional import cached_property
 
 
 class _RoleRegistry(dict):
