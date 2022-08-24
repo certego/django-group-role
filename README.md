@@ -76,6 +76,12 @@ Since `Role` classes are not bound to database `Group` they must be synchronized
 
 See command help for further information regarding its arguments.
 
+### Signals
+Upon setup each role fires two signals:
+
+- `pre_role_setup`: before the setup process starts, providing `role` and `clear` kwargs
+- `post_role_setup`: after the setup process ends, providing `role` kwargs
+
 ## Use in unittest (TestCase)
 For django style `TestCase` based testing is it possible to use the `RoleEnabledTestMixin`. This overrides the `setUpTestData` to load and create role-related data before running tests.
 

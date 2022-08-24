@@ -4,6 +4,7 @@ from importlib import import_module
 from django.core.exceptions import ImproperlyConfigured, MultipleObjectsReturned
 from django.utils.functional import cached_property
 from .exceptions import BadRoleException
+from .signals import post_role_setup, pre_role_setup
 from .utils import map_permissions
 
 
@@ -79,6 +80,7 @@ class Role(metaclass=RegisterRoleMeta):
         from django.contrib.auth.models import Permission
         from guardian.shortcuts import assign_perm
 
+        pre_role_setup.send(self.__class__, role=self, clear=clear)
         if clear:
             self.group.permissions.clear()
 
@@ -112,6 +114,8 @@ class Role(metaclass=RegisterRoleMeta):
                             )
                         else:
                             assign_perm(perm, self.group)
+
+        post_role_setup.send(self.__class__, role=self)
 
     # wrappers for group methods
     def _wrap_group_method(self, method, *args, **kwargs):
