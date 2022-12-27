@@ -127,8 +127,23 @@ class Role(metaclass=RegisterRoleMeta):
     set = partialmethod(_wrap_group_method, method="set")
     clear = partialmethod(_wrap_group_method, method="clear")
 
+    def has_perm(self, perm):
+        # split perm in app and codename
+        app_label, codename = perm.split('.', 1)
+        if app_label in self._permissions:
+            # just check if codename is in any model permission for provided app
+            return any(codename in perms for perms in self._permissions[app_label].values())
+        return False
+
+    def has_perms(self, *perms):
+        return all(self.has_perm(p) for p in perms)
+
+    def has_any_perm(self, *perms):
+        return any(self.has_perm(p) for p in perms)
+
 
 def load_roles():
+    """Force roles to be loaded and returns the updated role registry."""
     from django.conf import settings
 
     role_module = getattr(settings, "ROLES_MODULE", None)
@@ -153,3 +168,5 @@ def load_roles():
             and not candidate is Role  # avoid base class to be added to registry
         ):
             registry[candidate._group] = candidate
+
+    return registry
