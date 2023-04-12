@@ -1,23 +1,11 @@
-from copy import deepcopy
 from django.contrib.auth.models import Group
-from django.test import TestCase, override_settings
-from django_group_role.roles import Role, registry, load_roles
+from django.test import TestCase
 from django_group_role.test import RoleEnabledTestMixin
 
 
 class BaseTestingTestCase(RoleEnabledTestMixin, TestCase):
-    # need to keep registry clear in these tests
-    @classmethod
-    def setUpClass(cls):
-        cls._registry = deepcopy(registry)
-        registry.clear()
-        super().setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        registry.clear()
-        registry.update(cls._registry)
+    clear_role_registry = True
+    force_role_reload = True
 
 
 class OnlySelectedTestCase(BaseTestingTestCase):

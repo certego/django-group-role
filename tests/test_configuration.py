@@ -20,7 +20,7 @@ class ConfigurationTestCase(SimpleTestCase):
             ImproperlyConfigured,
             "ROLES_MODULE settings is required to correctly load roles!",
         ):
-            load_roles()
+            load_roles(force=True)
 
     @override_settings(ROLES_MODULE="nowhere.nothing")
     def test_configuration_module_not_found(self):
@@ -28,11 +28,11 @@ class ConfigurationTestCase(SimpleTestCase):
             ImproperlyConfigured,
             "No module nowhere.nothing from which import roles found!",
         ):
-            load_roles()
+            load_roles(force=True)
 
     @override_settings(ROLES_MODULE="example_project.roles_secondary")
     def test_loading(self):
-        load_roles()
+        load_roles(force=True)
         self.assertCountEqual(
             registry.keys(),
             [

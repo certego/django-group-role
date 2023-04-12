@@ -20,6 +20,7 @@ class _RoleRegistry(dict):
 
 # registry which stores the list of available roles
 registry = _RoleRegistry()
+registry._loaded = False
 
 
 class RegisterRoleMeta(type):
@@ -142,7 +143,7 @@ class Role(metaclass=RegisterRoleMeta):
         return any(self.has_perm(p) for p in perms)
 
 
-def load_roles():
+def load_roles(*, force=False, clear=False):
     """Force roles to be loaded and returns the updated role registry."""
     from django.conf import settings
 
@@ -152,21 +153,27 @@ def load_roles():
             "ROLES_MODULE settings is required to correctly load roles!"
         )
 
-    try:
-        mod = import_module(role_module)
-    except ImportError:
-        raise ImproperlyConfigured(
-            f"No module {role_module} from which import roles found!"
-        )
+    # avoid to reload the registry if not needed
+    if force or not registry._loaded:
+        if clear:
+            registry.clear()
 
-    # get roles by inspecting module
-    for name, candidate in inspect.getmembers(mod, inspect.isclass):
-        if (
-            issubclass(candidate, Role)
-            and candidate._group not in registry
-            and not candidate.abstract  # do not register abstract roles
-            and not candidate is Role  # avoid base class to be added to registry
-        ):
-            registry[candidate._group] = candidate
+        try:
+            mod = import_module(role_module)
+        except ImportError:
+            raise ImproperlyConfigured(
+                f"No module {role_module} from which import roles found!"
+            )
 
+        # get roles by inspecting module
+        for name, candidate in inspect.getmembers(mod, inspect.isclass):
+            if (
+                issubclass(candidate, Role)
+                and candidate._group not in registry
+                and not candidate.abstract  # do not register abstract roles
+                and candidate is not Role  # avoid base class to be added to registry
+            ):
+                registry[candidate._group] = candidate
+
+        registry._loaded = True
     return registry
