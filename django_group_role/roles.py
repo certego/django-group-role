@@ -14,7 +14,7 @@ class _RoleRegistry(dict):
 
     def __setitem__(self, k, v):
         if k in self:
-            raise ValueError(f"{key} already bound to role registry")
+            raise ValueError(f"{k} already bound to role registry")
         super().__setitem__(k, v)
 
 
