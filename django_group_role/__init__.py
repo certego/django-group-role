@@ -25,4 +25,5 @@ def is_user_in_role(user, role) -> bool:
 
     return user.groups.filter(name=role.name).exists()
 
-__version__ = (0, 5, 1)
+
+__version__ = (0, 6, 0)
