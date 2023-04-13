@@ -39,23 +39,18 @@ class RegisterRoleMeta(type):
         assert not bases or permissions, "A Role must specify at least 1 permission"
         return permissions
 
-    @classmethod
-    def _get_declared_group_name(cls, bases, classdict):
+    def __new__(cls, classname, bases, classdict, **kwargs):
         name = classdict.get("name", None)
         assert (
             not bases or isinstance(name, str) and name
         ), "Role name must not be empty"
-        return name
-
-    def __new__(cls, classname, bases, classdict, **kwargs):
-        classdict["_group"] = cls._get_declared_group_name(bases, classdict)
         classdict["_permissions"] = cls._get_declared_permissions(bases, classdict)
         # stop inheritance of abstractness
         is_abstract = classdict.setdefault("abstract", False)
         role_class = super().__new__(cls, classname, bases, classdict, **kwargs)
         if not is_abstract:
             # add role to register
-            registry[role_class._group] = role_class
+            registry[role_class.name] = role_class
 
         return role_class
 
@@ -71,7 +66,7 @@ class Role(metaclass=RegisterRoleMeta):
     def group(self):
         from django.contrib.auth.models import Group
 
-        group, _created = Group.objects.get_or_create(name=self._group)
+        group, _created = Group.objects.get_or_create(name=self.name)
         return group
 
     def setup_permissions(self, clear=False):
@@ -175,13 +170,13 @@ def load_roles(*, force=False, clear=False):
         for name, candidate in inspect.getmembers(mod, inspect.isclass):
             if (
                 issubclass(candidate, Role)
-                and candidate._group not in registry
+                and candidate.name not in registry
                 # do not register abstract roles
                 and not candidate.abstract
                 # avoid base class to be added to registry
                 and candidate is not Role
             ):
-                registry[candidate._group] = candidate
+                registry[candidate.name] = candidate
 
         registry._loaded = True
     return registry
