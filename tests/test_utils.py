@@ -1,4 +1,4 @@
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase
 from django_group_role.utils import map_permissions
 
 
@@ -6,7 +6,7 @@ class UtilsSimpleTestCase(SimpleTestCase):
     def test_map_permissions_list_wrong_code(self):
         with self.assertRaisesMessage(
             ValueError,
-            "Permissions, should be defined in the format: 'app_label.codename' (is view_user)",
+            "Permissions, should be defined in the format: 'app_label.codename' (but is view_user)",
         ):
             map_permissions(["view_user"])
 

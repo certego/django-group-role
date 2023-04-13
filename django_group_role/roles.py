@@ -26,12 +26,14 @@ registry._loaded = False
 class RegisterRoleMeta(type):
     @classmethod
     def _get_declared_permissions(cls, bases, classdict):
-        permissions = classdict.get("permissions", [])
+        permissions = classdict.get("permissions", ())
         # merge permissions with base classes
         permissions = [permissions]
         if bases:
             permissions = reduce(
-                lambda a, b: a + [getattr(b, "_permissions", None)], bases, permissions
+                lambda a, b: a + [getattr(b, "_permissions", None)],
+                bases,
+                permissions,
             )
         permissions = map_permissions(*permissions)
         assert not bases or permissions, "A Role must specify at least 1 permission"
@@ -39,7 +41,7 @@ class RegisterRoleMeta(type):
 
     @classmethod
     def _get_declared_group_name(cls, bases, classdict):
-        name = classdict.pop("name", None)
+        name = classdict.get("name", None)
         assert (
             not bases or isinstance(name, str) and name
         ), "Role name must not be empty"
@@ -62,7 +64,7 @@ class Role(metaclass=RegisterRoleMeta):
     """Base role class. Every role must inherit from this."""
 
     name: str = None
-    permissions = []
+    permissions = ()
     abstract = True
 
     @cached_property
@@ -76,7 +78,8 @@ class Role(metaclass=RegisterRoleMeta):
         """Assignes declared permissions to this role group.
 
         Args:
-            clear (bool, optional): If passed as True also clears existing permissions bound to this role. Defaults to False.
+            clear (bool, optional): If passed as True also clears existing
+                permissions bound to this role. Defaults to False.
         """
         from django.contrib.auth.models import Permission
         from guardian.shortcuts import assign_perm
@@ -99,7 +102,8 @@ class Role(metaclass=RegisterRoleMeta):
                             MultipleObjectsReturned,
                         ):
                             raise BadRoleException(
-                                f"Permission {perm} cannot be bound to role", perm
+                                f"Permission {perm} cannot be bound to role",
+                                perm,
                             )
                 else:
                     # model-grouped perms
@@ -110,8 +114,8 @@ class Role(metaclass=RegisterRoleMeta):
                             )
                         except (ValueError, Permission.DoesNotExist):
                             raise BadRoleException(
-                                f"Permission {perm} ({app_label})  cannot be bound to role",
-                                f"{app_label}.{perm}",
+                                f"Permission {perm} ({app_label}) cannot be bound to role",
+                                f"{app_label}.{perm}"
                             )
                         else:
                             assign_perm(perm, self.group)
@@ -128,18 +132,20 @@ class Role(metaclass=RegisterRoleMeta):
     set = partialmethod(_wrap_group_method, method="set")
     clear = partialmethod(_wrap_group_method, method="clear")
 
-    def has_perm(self, perm):
+    def has_perm(self, perm: str) -> bool:
         # split perm in app and codename
-        app_label, codename = perm.split('.', 1)
+        app_label, codename = perm.split(".", 1)
         if app_label in self._permissions:
             # just check if codename is in any model permission for provided app
-            return any(codename in perms for perms in self._permissions[app_label].values())
+            return any(
+                codename in perms for perms in self._permissions[app_label].values()
+            )
         return False
 
-    def has_perms(self, *perms):
+    def has_perms(self, *perms) -> bool:
         return all(self.has_perm(p) for p in perms)
 
-    def has_any_perm(self, *perms):
+    def has_any_perm(self, *perms) -> bool:
         return any(self.has_perm(p) for p in perms)
 
 
@@ -170,8 +176,10 @@ def load_roles(*, force=False, clear=False):
             if (
                 issubclass(candidate, Role)
                 and candidate._group not in registry
-                and not candidate.abstract  # do not register abstract roles
-                and candidate is not Role  # avoid base class to be added to registry
+                # do not register abstract roles
+                and not candidate.abstract
+                # avoid base class to be added to registry
+                and candidate is not Role
             ):
                 registry[candidate._group] = candidate
 

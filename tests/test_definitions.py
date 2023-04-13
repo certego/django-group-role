@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 from django_group_role import Role, registry
-from example_project.roles import AbstractRole, BasicRole, Erasers, GroupManagers, UserManagers
+from example_project.roles import AbstractRole, Erasers, GroupManagers, UserManagers
 
 
 class DefinitionsTestCase(SimpleTestCase):
@@ -30,7 +30,7 @@ class DefinitionsTestCase(SimpleTestCase):
 
         with self.assertRaisesMessage(
             ValueError,
-            "Permissions, should be defined in the format: 'app_label.codename' (is perm)",
+            "Permissions, should be defined in the format: 'app_label.codename' (but is perm)",
         ):
             class NoPermRole(Role):
                 name = "test"
