@@ -1,7 +1,7 @@
 from io import StringIO
 from django.contrib.auth.models import Group
 from django.core.management import call_command
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from guardian.shortcuts import assign_perm
 
 

@@ -1,7 +1,7 @@
 from copy import deepcopy
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, override_settings
-from django_group_role.roles import Role, registry, load_roles
+from django_group_role.roles import registry, load_roles
 
 
 class ConfigurationTestCase(SimpleTestCase):
