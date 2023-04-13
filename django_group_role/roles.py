@@ -110,7 +110,7 @@ class Role(metaclass=RegisterRoleMeta):
                         except (ValueError, Permission.DoesNotExist):
                             raise BadRoleException(
                                 f"Permission {perm} ({app_label}) cannot be bound to role",
-                                f"{app_label}.{perm}"
+                                f"{app_label}.{perm}",
                             )
                         else:
                             assign_perm(perm, self.group)

@@ -47,9 +47,8 @@ class Command(BaseCommand):
         fuzzy = options.get("fuzzy", False)
         if clear:
             self.stdout.write(
-                self.style.NOTICE(
-                    "Clear mode enabled, already bound permissions will be removed!"
-                )
+                "Clear mode enabled, already bound permissions will be removed!",
+                self.style.NOTICE,
             )
         if fuzzy:
             check_name = _fuzzy_search(rolenames)
@@ -66,11 +65,10 @@ class Command(BaseCommand):
                     role.setup_permissions(clear)
                 except BadRoleException as ex:
                     self.stdout.write(
-                        self.style.ERROR(
-                            f'Unable to bound permission to "{name}" ({ex})'
-                        )
+                        f'Unable to bound permission to "{name}" ({ex})',
+                        self.style.ERROR,
                     )
                 else:
                     self.stdout.write(
-                        self.style.SUCCESS(f'Role "{name}" setup completed!')
+                        f'Role "{name}" setup completed!', self.style.SUCCESS
                     )
