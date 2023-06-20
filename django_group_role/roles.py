@@ -1,11 +1,14 @@
-from functools import reduce, partialmethod
 import inspect
+from contextlib import nullcontext, suppress
+from functools import partialmethod, reduce
 from importlib import import_module
-from django.core.exceptions import ImproperlyConfigured, MultipleObjectsReturned
+
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
+
 from .exceptions import BadRoleException
 from .signals import post_role_setup, pre_role_setup
-from .utils import map_permissions
+from .utils import get_permission, map_permissions
 
 
 class _RoleRegistry(dict):
@@ -69,6 +72,15 @@ class Role(metaclass=RegisterRoleMeta):
         group, _created = Group.objects.get_or_create(name=self.name)
         return group
 
+    @classmethod
+    def iter_perms(cls, catch=False):
+        context = suppress(BadRoleException) if catch else nullcontext()
+        for app_label, app_perms in cls._permissions.items():
+            for modelname, perms in app_perms.items():
+                for perm in sorted(perms):
+                    with context:
+                        yield get_permission(perm, app_label, modelname)
+
     def setup_permissions(self, clear=False):
         """Assignes declared permissions to this role group.
 
@@ -76,45 +88,11 @@ class Role(metaclass=RegisterRoleMeta):
             clear (bool, optional): If passed as True also clears existing
                 permissions bound to this role. Defaults to False.
         """
-        from django.contrib.auth.models import Permission
-        from guardian.shortcuts import assign_perm
-
         pre_role_setup.send(self.__class__, role=self, clear=clear)
         if clear:
-            self.group.permissions.clear()
-
-        for app_label, app_perms in self._permissions.items():
-            for modelname, perms in app_perms.items():
-                if modelname == "_codenames":
-                    # handle codenames permissions
-                    for perm in perms:
-                        perm = f"{app_label}.{perm}"
-                        try:
-                            assign_perm(perm, self.group)
-                        except (
-                            ValueError,
-                            Permission.DoesNotExist,
-                            MultipleObjectsReturned,
-                        ):
-                            raise BadRoleException(
-                                f"Permission {perm} cannot be bound to role",
-                                perm,
-                            )
-                else:
-                    # model-grouped perms
-                    for perm in perms:
-                        try:
-                            perm = Permission.objects.get_by_natural_key(
-                                perm, app_label, modelname
-                            )
-                        except (ValueError, Permission.DoesNotExist):
-                            raise BadRoleException(
-                                f"Permission {perm} ({app_label}) cannot be bound to role",
-                                f"{app_label}.{perm}",
-                            )
-                        else:
-                            assign_perm(perm, self.group)
-
+            self.group.permissions.set(self.iter_perms())
+        else:
+            self.group.permissions.add(*self.iter_perms())
         post_role_setup.send(self.__class__, role=self)
 
     # wrappers for group methods

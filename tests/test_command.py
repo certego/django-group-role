@@ -36,7 +36,7 @@ class CommandTestCase(TestCase):
                 'Setting permissions for role "Erasers"...',
                 'Unable to bound permission to "Erasers" (Permission broken (auth) cannot be bound to role)',
                 'Setting permissions for role "Broken"...',
-                'Unable to bound permission to "Broken" (Permission auth.non_existing_perm cannot be bound to role)',
+                'Unable to bound permission to "Broken" (Permission non_existing_perm (auth) cannot be bound to role)',
                 "",
             ],
         )
@@ -112,7 +112,7 @@ class CommandTestCase(TestCase):
                 'Setting permissions for role "Erasers"...',
                 'Unable to bound permission to "Erasers" (Permission broken (auth) cannot be bound to role)',
                 'Setting permissions for role "Broken"...',
-                'Unable to bound permission to "Broken" (Permission auth.non_existing_perm cannot be bound to role)',
+                'Unable to bound permission to "Broken" (Permission non_existing_perm (auth) cannot be bound to role)',
                 "",
             ],
         )

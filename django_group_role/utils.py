@@ -1,6 +1,10 @@
 from collections import defaultdict
 from functools import reduce
 
+from django.core.exceptions import MultipleObjectsReturned
+
+from .exceptions import BadRoleException
+
 
 def _map_permissions(perm_map, permissions):
     if not permissions:
@@ -44,3 +48,24 @@ def map_permissions(*permissions_list):
     perm_map = defaultdict(lambda: defaultdict(set))
     # turn back defaultdicto into dict to avoid false matches
     return dict(reduce(_map_permissions, permissions_list, perm_map))
+
+
+def get_permission(codename: str, app_label: str, model: str):
+    from django.contrib.auth.models import Permission
+
+    try:
+        if model == "_codenames":
+            return Permission.objects.get(
+                codename=codename, content_type__app_label=app_label
+            )
+        else:
+            return Permission.objects.get_by_natural_key(codename, app_label, model)
+    except (
+        ValueError,
+        Permission.DoesNotExist,
+        MultipleObjectsReturned,
+    ) as ex:
+        raise BadRoleException(
+            f"Permission {codename} ({app_label}) cannot be bound to role",
+            f"{app_label}.{codename}",
+        ) from ex
