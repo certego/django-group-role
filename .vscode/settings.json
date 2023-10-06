@@ -11,6 +11,10 @@
         "**/*.pytest_cache": true,
         ".ropeproject": true,
         ".coverage": true,
+        ".tox": true,
+        ".venv": true,
+        ".eggs": true,
+        "*.egg-info": true,
     },
     "python.analysis.extraPaths": [
         "${workspaceFolder}/tests/"
@@ -21,5 +25,5 @@
     "python.testing.pytestArgs": [
         "--reuse-db"
     ],
-    "python.formatting.provider": "black"
+    "black-formatter.importStrategy": "fromEnvironment",
 }

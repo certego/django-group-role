@@ -1,4 +1,5 @@
 from io import StringIO
+from django import VERSION
 from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.test import TestCase
@@ -6,6 +7,10 @@ from guardian.shortcuts import assign_perm
 
 
 class CommandTestCase(TestCase):
+    if VERSION < (4, 2):
+        def assertQuerySetEqual(self, *args, **kwargs):
+            return super().assertQuerysetEqual(*args, **kwargs)
+
     @classmethod
     def setUpTestData(cls):
         group_maps = {
@@ -42,7 +47,7 @@ class CommandTestCase(TestCase):
         )
         self.assertEqual(Group.objects.all().count(), 7)
         group = Group.objects.get_by_natural_key("Users")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             group.permissions.all(),
             [
                 ("view_group", "auth", "group"),
@@ -53,7 +58,7 @@ class CommandTestCase(TestCase):
             ordered=False,
         )
         group = Group.objects.get_by_natural_key("User-Managers")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             group.permissions.all(),
             [
                 ("view_group", "auth", "group"),
@@ -66,7 +71,7 @@ class CommandTestCase(TestCase):
             ordered=False,
         )
         group = Group.objects.get_by_natural_key("Group Managers")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             group.permissions.all(),
             [
                 ("view_group", "auth", "group"),
@@ -78,7 +83,7 @@ class CommandTestCase(TestCase):
             ordered=False,
         )
         group = Group.objects.get_by_natural_key("Top-Managers")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             group.permissions.all(),
             [
                 ("view_user", "auth", "user"),
@@ -118,7 +123,7 @@ class CommandTestCase(TestCase):
         )
         self.assertEqual(Group.objects.all().count(), 7)
         group = Group.objects.get_by_natural_key("Users")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             group.permissions.all(),
             [
                 ("view_group", "auth", "group"),
@@ -128,7 +133,7 @@ class CommandTestCase(TestCase):
             ordered=False,
         )
         group = Group.objects.get_by_natural_key("User-Managers")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             group.permissions.all(),
             [
                 ("view_group", "auth", "group"),
@@ -140,7 +145,7 @@ class CommandTestCase(TestCase):
             ordered=False,
         )
         group = Group.objects.get_by_natural_key("Group Managers")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             group.permissions.all(),
             [
                 ("view_group", "auth", "group"),
@@ -152,7 +157,7 @@ class CommandTestCase(TestCase):
             ordered=False,
         )
         group = Group.objects.get_by_natural_key("Top-Managers")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             group.permissions.all(),
             [
                 ("view_user", "auth", "user"),
@@ -182,7 +187,7 @@ class CommandTestCase(TestCase):
         )
         self.assertEqual(Group.objects.all().count(), 3)
         group = Group.objects.get_by_natural_key("Users")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             group.permissions.all(),
             [
                 ("view_group", "auth", "group"),
@@ -193,7 +198,7 @@ class CommandTestCase(TestCase):
         )
         # user managers group was not modified
         group = Group.objects.get_by_natural_key("User-Managers")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             group.permissions.all(),
             [
                 ("view_user", "auth", "user"),
@@ -222,7 +227,7 @@ class CommandTestCase(TestCase):
             ],
         )
         group = Group.objects.get_by_natural_key("Group Managers")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             group.permissions.all(),
             [
                 ("view_group", "auth", "group"),
