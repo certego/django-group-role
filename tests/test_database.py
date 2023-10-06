@@ -1,3 +1,4 @@
+from django import VERSION
 from django.contrib.auth.models import Group
 from django.test import TestCase
 from guardian.shortcuts import assign_perm
@@ -5,6 +6,10 @@ from example_project.roles import BasicRole
 
 
 class DatabaseSetupTestCase(TestCase):
+    if VERSION < (4, 2):
+        def assertQuerySetEqual(self, *args, **kwargs):
+            return super().assertQuerysetEqual(*args, **kwargs)
+
     def test_create_role_group_if_not_exists(self):
         with self.assertRaises(Group.DoesNotExist):
             Group.objects.get_by_natural_key("Users")
@@ -26,7 +31,7 @@ class DatabaseSetupTestCase(TestCase):
         self.assertFalse(role.group.permissions.all().exists())
         assign_perm("auth.delete_user", role.group)
         role.setup_permissions()
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             role.group.permissions.values_list("codename", flat=True),
             ["view_user", "view_group", "delete_user"],
             transform=str,
@@ -39,7 +44,7 @@ class DatabaseSetupTestCase(TestCase):
         self.assertFalse(role.group.permissions.all().exists())
         assign_perm("auth.delete_user", role.group)
         role.setup_permissions(True)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             role.group.permissions.values_list("codename", flat=True),
             [
                 "view_user",
