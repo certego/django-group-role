@@ -1,12 +1,10 @@
 import inspect
-from contextlib import nullcontext, suppress
 from functools import partialmethod, reduce
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
 
-from .exceptions import BadRoleException
 from .signals import post_role_setup, pre_role_setup
 from .utils import get_permission, map_permissions
 
@@ -73,13 +71,11 @@ class Role(metaclass=RegisterRoleMeta):
         return group
 
     @classmethod
-    def iter_perms(cls, catch=False):
-        context = suppress(BadRoleException) if catch else nullcontext()
+    def iter_perms(cls):
         for app_label, app_perms in cls._permissions.items():
             for modelname, perms in app_perms.items():
                 for perm in sorted(perms):
-                    with context:
-                        yield get_permission(perm, app_label, modelname)
+                    yield get_permission(perm, app_label, modelname)
 
     def setup_permissions(self, clear=False):
         """Assignes declared permissions to this role group.
