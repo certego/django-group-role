@@ -1,5 +1,6 @@
 from django.test import override_settings
-from .roles import load_roles, registry, BadRoleException
+from .exceptions import BadRoleException
+from .roles import load_roles, registry
 
 
 class RoleEnabledTestMixin:

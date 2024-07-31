@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
-from ...roles import registry, load_roles, BadRoleException
+from ...exceptions import BadRoleException
+from ...roles import registry, load_roles
 
 
 def _fuzzy_search(rolenames):
