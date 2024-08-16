@@ -11,7 +11,7 @@ description = "Django Group-based roles"
 name = "django-group-role"
 requires-python = ">=3.10"
 dependencies = [
-    "django>=3.2,<5.1",
+    "django>=3.2,<5.2",
 ]
 classifiers = [
 	"Programming Language :: Python",
@@ -25,6 +25,7 @@ classifiers = [
 	"Framework :: Django :: 4.1",
 	"Framework :: Django :: 4.2",
 	"Framework :: Django :: 5.0",
+	"Framework :: Django :: 5.1",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 	"Intended Audience :: Developers",
@@ -78,7 +79,7 @@ legacy_tox_ini = """
 [tox]
 envlist =
     py{310}-django32
-    py{310,311,312}-django{40,41,42,50,main}
+    py{310,311,312}-django{40,41,42,50,51,main}
 
 [gh]
 python =
@@ -93,6 +94,7 @@ DJANGO =
     4.1: dj41
     4.2: dj42
     5.0: dj50
+    5.0: dj51
     main: djmain
 
 [testenv]
@@ -105,6 +107,7 @@ deps=
     django40: Django>=4.0,<4.1
     django41: Django>=4.1,<4.2
     django42: Django>=4.2,<4.3
-    django50: Django>=5.0a,<5.1
+    django50: Django>=5.0,<5.1
+    django51: Django>=5.1,<5.2
     djmain: https://github.com/django/django/archive/main.tar.gz
 """
