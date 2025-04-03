@@ -19,13 +19,12 @@ classifiers = [
 	"Programming Language :: Python :: 3.10",
 	"Programming Language :: Python :: 3.11",
 	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: 3.13",
 	"Framework :: Django",
-	"Framework :: Django :: 3.2",
-	"Framework :: Django :: 4.0",
-	"Framework :: Django :: 4.1",
 	"Framework :: Django :: 4.2",
 	"Framework :: Django :: 5.0",
 	"Framework :: Django :: 5.1",
+	"Framework :: Django :: 5.2",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 	"Intended Audience :: Developers",
@@ -78,23 +77,22 @@ pythonpath = "."
 legacy_tox_ini = """
 [tox]
 envlist =
-    py{310}-django32
-    py{310,311,312}-django{40,41,42,50,51,main}
+    py{310,311,312}-django{42,50,51,52,main}
+    py313-django{51,52,main}
 
 [gh]
 python =
+    3.13 = py313
     3.12 = py312
     3.11 = py311
     3.10 = py310
 
 [gh-actions:env]
 DJANGO =
-    3.2: dj32
-    4.0: dj40
-    4.1: dj41
     4.2: dj42
     5.0: dj50
-    5.0: dj51
+    5.1: dj51
+    5.1: dj52
     main: djmain
 
 [testenv]
@@ -103,11 +101,9 @@ extras = tests
 whitelist_externals = py.test
 commands = py.test
 deps=
-    django32: Django>=3.2,<3.3
-    django40: Django>=4.0,<4.1
-    django41: Django>=4.1,<4.2
     django42: Django>=4.2,<4.3
     django50: Django>=5.0,<5.1
     django51: Django>=5.1,<5.2
+    django53: Django>=5.2,<5.3
     djmain: https://github.com/django/django/archive/main.tar.gz
 """
