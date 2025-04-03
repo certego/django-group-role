@@ -6,7 +6,7 @@ from django.core.exceptions import MultipleObjectsReturned
 from .exceptions import BadRoleException
 
 
-def _map_permissions(perm_map, permissions):
+def _map_permissions(perm_map: dict, permissions) -> dict:
     if not permissions:
         return perm_map
 

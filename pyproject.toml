@@ -3,15 +3,14 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "0.7.3"
-authors = [
-    {"name"= "Davide Setti"},
-]
+version = "0.7.4"
+license = "Apache-2.0"
+authors = [{"name"= "Davide Setti"}]
 description = "Django Group-based roles"
 name = "django-group-role"
 requires-python = ">=3.10"
 dependencies = [
-    "django>=3.2,<5.2",
+    "django>=4.2,<5.3",
 ]
 classifiers = [
 	"Programming Language :: Python",
@@ -25,7 +24,6 @@ classifiers = [
 	"Framework :: Django :: 5.0",
 	"Framework :: Django :: 5.1",
 	"Framework :: Django :: 5.2",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 	"Intended Audience :: Developers",
 ]
@@ -47,7 +45,11 @@ tests = [
 
 
 [tool.setuptools]
-packages = ["django_group_role"]
+packages = [
+    "django_group_role",
+    "django_group_role.management",
+    "django_group_role.management.commands"
+]
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"], content-type = "text/markdown; charset=UTF-8; variant=GFM"}

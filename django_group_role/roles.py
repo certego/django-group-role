@@ -60,7 +60,7 @@ class Role(metaclass=RegisterRoleMeta):
     """Base role class. Every role must inherit from this."""
 
     name: str = None
-    permissions = ()
+    permissions: dict | list | tuple = ()
     abstract = True
 
     @cached_property
@@ -118,7 +118,7 @@ class Role(metaclass=RegisterRoleMeta):
         return any(self.has_perm(p) for p in perms)
 
 
-def load_roles(*, force=False, clear=False):
+def load_roles(*, force=False, clear=False) -> _RoleRegistry:
     """Force roles to be loaded and returns the updated role registry."""
     from django.conf import settings
 
